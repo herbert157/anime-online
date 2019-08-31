@@ -13,10 +13,10 @@ def carregar_arquivo(anime):
     return anime
 
 
-def anime_verificar(anime,quantidade):
+def anime_verificar(anime):
 
     try:
-        for i in range(0,quantidade,2):
+        for i in range(0,len(anime),2):
             if int(anime[i+1])<9:
                 requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-0%s/legendado'%(anime[i],anime[i+1]))
             else:
@@ -35,10 +35,11 @@ def anime_verificar(anime,quantidade):
 def add_anime(anime):
     
     arquivo=open('anime.txt','a')
-    print('Digite o nome do anime, por favor:')      #criar uma verificação para caso o anime não for encontrado!!
+    print('Digite o nome do anime, por favor:')     
     nome=input()
     print('Digite o episodio:')
     episodio=int(input())
+    nome=converter_string(nome)
     anime.append(nome)
     anime.append(episodio)
     arquivo.write('%s %s\n'%(nome,episodio))
@@ -50,9 +51,13 @@ def anime_online():
     try:        
         print('Digite o nome do anime, por favor:') 
         nome=input()
+        nome=converter_string(nome)
         print('Digite o episodio:')
         episodio=int(input())
-        requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-%s/legendado'%(nome,episodio))
+        if(episodio<9):
+            requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-0%s/legendado'%(nome,episodio))
+        else:
+            requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-%s/legendado'%(nome,episodio))
         if(requisicao.status_code==200):
             print('EPISÓDIO ONLINE\n')
             print(requisicao.url)
@@ -71,22 +76,53 @@ def remover_anime(anime):
     nome=input()
     print(anime)
 
-    for i in  range(0,len(anime)):
-        if anime[i]==nome:                                    ##arrumar essa função
-            anime[i]=anime[len(anime)-2]
-            anime[i+1]=anime[len(anime)-1]
-            anime.remove(anime[len(anime)-2])
-            anime.remove(anime[len(anime)-1])
+    nome=converter_string(nome)
+    posicao=buscar(anime,nome)
+                                          #arrumar essa função
+    if(posicao==-1):
+        print('ANIME NÃO ENCONTRADO!\n')
+        return anime
+    anime.pop(posicao)
+    anime.pop(posicao)
 
-    print(anime)
+    arquivo=open('anime.txt','w')
 
+    for i in range(0,len(anime),2):
+        arquivo.write('%s %s\n'%(anime[i],anime[i+1]))
+
+    arquivo.close()
     return anime
     
+def buscar(anime,nome):
+    contador=0
+    for i in anime:
+        if(i==nome):
+            print('achei!!')
+            return contador
+        contador+=1
+    return -1
+
+def converter_string(string):
+    texto=""
+    contador=0
+    ultimo=0
+
+    string=str(string)+' '
+
+    for i in string:
+        if(i==' '):
+            if(ultimo==0):
+                texto=str(string[ultimo:contador])
+            else:
+                texto=str(texto[:])+'-'+str(string[ultimo+1:contador])
+            ultimo=contador
+        contador+=1
+    return texto
 
 anime=[]
 anime=carregar_arquivo(anime)
 quantidade=len(anime)
-anime_verificar(anime,quantidade)
+anime_verificar(anime)
 
 print('\n########BEM-VINDO AO PROGRAMA VERIFICADOR DE ANIME########\n')
 
@@ -97,15 +133,17 @@ while True:
     x=int(input())
     if x==1:
         anime=add_anime(anime)        
-        quantidade=len(anime)
     elif x==2:
         anime_online()
     elif x==3:
-        anime_verificar(anime,quantidade)
+        anime_verificar(anime)
     elif x==4:
         anime=remover_anime(anime)
     elif x==5:
         exit(1)
+    elif x==6:
+        print(anime)
+        print(len(anime))
         
 
     
