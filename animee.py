@@ -15,22 +15,28 @@ def carregar_arquivo(anime):
 
 def anime_verificar(anime):
 
+    link=[]
+    
     try:
         for i in range(0,len(anime),2):
-            if int(anime[i+1])<9:
+            if int(anime[i+1])<=9:
                 requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-0%s/legendado'%(anime[i],anime[i+1]))
             else:
                 requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-%s/legendado'%(anime[i],anime[i+1])) 
             if requisicao.status_code==200:
                 print('O episódio %s do anime %s está ONLINE'%(anime[i+1],anime[i]))
+                link.append(requisicao.url)
             else:
-                print('O episódio %s do anime %s NÃO está ONLINE'%(anime[i+1],anime[i]))        
+                print('O episódio %s do anime %s NÃO está ONLINE'%(anime[i+1],anime[i]))
     except ConnectionError as e:
         print('ERRO DE REDE:',e)
     except HTTPError as e:
         print('ERRRO HTTP',e)
     except Timeout as e:
         print('TEMPO EXCEDIDO',e)
+    print('\n')
+    for i in link:
+        print(i)
         
 def add_anime(anime):
     
@@ -54,7 +60,7 @@ def anime_online():
         nome=converter_string(nome)
         print('Digite o episodio:')
         episodio=int(input())
-        if(episodio<9):
+        if(episodio<=9):
             requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-0%s/legendado'%(nome,episodio))
         else:
             requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-%s/legendado'%(nome,episodio))
@@ -80,24 +86,26 @@ def remover_anime(anime):
     posicao=buscar(anime,nome)
                                           #arrumar essa função
     if(posicao==-1):
+
         print('ANIME NÃO ENCONTRADO!\n')
-        return anime
-    anime.pop(posicao)
-    anime.pop(posicao)
 
-    arquivo=open('anime.txt','w')
+    else:
 
-    for i in range(0,len(anime),2):
-        arquivo.write('%s %s\n'%(anime[i],anime[i+1]))
+        anime.pop(posicao)
+        anime.pop(posicao)
+        arquivo=open('anime.txt','w')
+        
+        for i in range(0,len(anime),2):
+            arquivo.write('%s %s\n'%(anime[i],anime[i+1]))
 
-    arquivo.close()
+        arquivo.close()
+
     return anime
     
 def buscar(anime,nome):
     contador=0
     for i in anime:
         if(i==nome):
-            print('achei!!')
             return contador
         contador+=1
     return -1
@@ -144,6 +152,7 @@ while True:
     elif x==6:
         print(anime)
         print(len(anime))
+
         
 
     
