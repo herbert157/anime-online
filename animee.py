@@ -1,14 +1,12 @@
 import requests
 
 def carregar_arquivo(anime):
-    arquivo=open('anime.txt','r')
 
-    for linha in arquivo:
-        dado=linha.split()
-        anime.append(dado[0])
-        anime.append(dado[1])
-
-    arquivo.close()
+    with open('anime.txt','r') as arquivo:        
+        for linha in arquivo:
+            dado=linha.split()
+            anime.append(dado[0])
+            anime.append(dado[1])
 
     return anime
 
@@ -60,11 +58,11 @@ def anime_online():
         nome=converter_string(nome)
         print('Digite o episodio:')
         episodio=int(input())
-        if(episodio<=9):
+        if episodio<=9:
             requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-0%s/legendado'%(nome,episodio))
         else:
             requisicao=requests.get('https://www.animesvision.com.br/animes/%s/episodio-%s/legendado'%(nome,episodio))
-        if(requisicao.status_code==200):
+        if requisicao.status_code==200:
             print('EPISÓDIO ONLINE\n')
             print(requisicao.url)
         else:
@@ -85,8 +83,8 @@ def remover_anime(anime):
     nome=converter_string(nome)
     posicao=buscar(anime,nome)
                                           #arrumar essa função
-    if(posicao==-1):
-
+    if posicao==-1 :
+        
         print('ANIME NÃO ENCONTRADO!\n')
 
     else:
@@ -105,7 +103,7 @@ def remover_anime(anime):
 def buscar(anime,nome):
     contador=0
     for i in anime:
-        if(i==nome):
+        if i==nome:
             return contador
         contador+=1
     return -1
@@ -118,8 +116,8 @@ def converter_string(string):
     string=str(string)+' '
 
     for i in string:
-        if(i==' '):
-            if(ultimo==0):
+        if i==' ':
+            if ultimo==0:
                 texto=str(string[ultimo:contador])
             else:
                 texto=str(texto[:])+'-'+str(string[ultimo+1:contador])
@@ -134,8 +132,6 @@ anime_verificar(anime)
 
 print('\n########BEM-VINDO AO PROGRAMA VERIFICADOR DE ANIME########\n')
 
-#print(anime)
-
 while True:
     print('\nDigite 1 para adicionar um novo anime\nDigite 2 para fazer uma verificação rápida de um anime especifico\nDigite 3 para verificar todos os animes salvos no arquivo\nDigite 4 para remover um anime listado\nDigite 5 para sair')
     x=int(input())
@@ -148,15 +144,5 @@ while True:
     elif x==4:
         anime=remover_anime(anime)
     elif x==5:
-        exit(1)
-    elif x==6:
-        print(anime)
-        print(len(anime))
-
-        
-
-    
-
-
-
+        exit(1)    
 
