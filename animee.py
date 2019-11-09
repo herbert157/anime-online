@@ -14,6 +14,7 @@ def carregar_arquivo(anime):
 def anime_verificar(anime):
 
     link=[]
+    nome_site=[]
     
     try:
         for i in range(0,len(anime),2):
@@ -36,18 +37,16 @@ def anime_verificar(anime):
     for i in link:
         print(i)
         
-def add_anime(anime):
+def add_anime(anime,nome):
     
-    arquivo=open('anime.txt','a')
-    print('Digite o nome do anime, por favor:')     
-    nome=input()
     print('Digite o episodio:')
     episodio=int(input())
-    nome=converter_string(nome)
-    anime.append(nome)
-    anime.append(episodio)
-    arquivo.write('%s %s\n'%(nome,episodio))
-    arquivo.close()
+    
+    with open('anime.txt','a') as arquivo:
+        anime.append(nome)
+        anime.append(episodio)
+        arquivo.write('%s %s\n'%(nome,episodio))
+        arquivo.close()
     return anime
 
 def anime_online():
@@ -74,21 +73,14 @@ def anime_online():
     except Timeout as e:
         print('TEMPO EXCEDIDO',e)
 
-def remover_anime(anime):
+def remover_anime(anime,nome):
     
-    print('Digite o nome do anime que deseja remover')
-    nome=input()
-    print(anime)
-
-    nome=converter_string(nome)
     posicao=buscar(anime,nome)
-                                          #arrumar essa função
+                                          
     if posicao==-1 :
-        
         print('ANIME NÃO ENCONTRADO!\n')
 
     else:
-
         anime.pop(posicao)
         anime.pop(posicao)
         arquivo=open('anime.txt','w')
@@ -99,7 +91,17 @@ def remover_anime(anime):
         arquivo.close()
 
     return anime
+
+def atualizar_episodio(anime,nome):
     
+    indice=buscar(anime,nome)
+
+    if indice==-1:
+        print('anime nao encontrado')
+    else:
+        remover_anime(anime,nome)
+        add_anime(anime,nome)
+
 def buscar(anime,nome):
     contador=0
     for i in anime:
@@ -107,6 +109,7 @@ def buscar(anime,nome):
             return contador
         contador+=1
     return -1
+
 
 def converter_string(string):
     texto=""
@@ -133,16 +136,26 @@ anime_verificar(anime)
 print('\n########BEM-VINDO AO PROGRAMA VERIFICADOR DE ANIME########\n')
 
 while True:
-    print('\nDigite 1 para adicionar um novo anime\nDigite 2 para fazer uma verificação rápida de um anime especifico\nDigite 3 para verificar todos os animes salvos no arquivo\nDigite 4 para remover um anime listado\nDigite 5 para sair')
+    print('\nDigite 1 para adicionar um novo anime\nDigite 2 para fazer uma verificação rápida de um anime especifico\nDigite 3 para verificar todos os animes salvos no arquivo\nDigite 4 para atualizar um episodio do anime ja adicionado\nDigite 5 para remover um anime listado\nDigite 6 para sair')
     x=int(input())
     if x==1:
-        anime=add_anime(anime)        
+        print('Digite o nome do anime, por favor:')     
+        nome=input()
+        nome=converter_string(nome)
+        anime=add_anime(anime,nome)        
     elif x==2:
         anime_online()
     elif x==3:
         anime_verificar(anime)
     elif x==4:
-        anime=remover_anime(anime)
+        print('Digite o nome do anime para atualizar o episodio')
+        nome=input()
+        nome=converter_string(nome)
+        atualizar_episodio(anime,nome)
     elif x==5:
+        print('Digite o nome do anime que deseja remover')
+        nome=input()
+        nome=converter_string(nome)
+        anime=remover_anime(anime,nome)
+    elif x==6:
         exit(1)    
-
